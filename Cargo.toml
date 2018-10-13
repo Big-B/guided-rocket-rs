@@ -9,6 +9,7 @@ embedded-hal = "*"
 nb = {version = "*", features = ["unstable"]}
 libm = "*"
 cortex-m = "*"
+heapless = {version = "*", features = ["const-fn"]}
 
 [dependencies.arduino_mkrzero]
 version = "*"

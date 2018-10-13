@@ -5,8 +5,9 @@
 use arduino_mkrzero::clock::GenericClockController;
 use arduino_mkrzero::delay::Delay;
 use arduino_mkrzero::prelude::*;
-use arduino_mkrzero::{entry, CorePeripherals, Peripherals};
 use arduino_mkrzero::sercom::*;
+use arduino_mkrzero::{entry, CorePeripherals, Peripherals};
+
 use core::fmt::Write;
 
 entry!(main);
@@ -24,22 +25,35 @@ fn main() -> ! {
     let mut delay = Delay::new(core.SYST, &mut clocks);
 
     let gclk0 = clocks.gclk0();
-    let rx_pin = pins.rx.into_pull_down_input(&mut pins.port).into_pad(&mut pins.port);
-    let tx_pin = pins.tx.into_push_pull_output(&mut pins.port).into_pad(&mut pins.port);
+    let rx_pin = pins
+        .rx
+        .into_pull_down_input(&mut pins.port)
+        .into_pad(&mut pins.port);
+    let tx_pin = pins
+        .tx
+        .into_push_pull_output(&mut pins.port)
+        .into_pad(&mut pins.port);
     let mut serial = UART5::new(
         &clocks.sercom5_core(&gclk0).unwrap(),
-        115200.hz(),
+        115_200.hz(),
         peripherals.SERCOM5,
         &mut core.NVIC,
         &mut peripherals.PM,
-        UART5Pinout::Rx3Tx2 {rx: rx_pin, tx: tx_pin});
-
+        UART5Pinout::Rx3Tx2 {
+            rx: rx_pin,
+            tx: tx_pin,
+        },
+    );
+    let mut i = 0u32;
     loop {
         led.set_low();
-        serial.write_str("Loop\n").unwrap();
+        write!(serial, "Loop: ");
+        write!(serial, "{}\n", i);
+        write!(serial, "{}\n", f64::from(i) / 3.123_456_789);
         delay.delay_ms(250u32);
         led.set_high();
         delay.delay_ms(250u32);
         led.set_low();
+        i += 1;
     }
 }
