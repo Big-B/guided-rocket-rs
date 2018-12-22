@@ -10,7 +10,7 @@ use arduino_mkrzero::{entry, CorePeripherals, Peripherals};
 
 use core::fmt::Write;
 
-entry!(main);
+#[entry]
 fn main() -> ! {
     let mut peripherals = Peripherals::take().unwrap();
     let mut core = CorePeripherals::take().unwrap();
@@ -47,9 +47,9 @@ fn main() -> ! {
     let mut i = 0u32;
     loop {
         led.set_low();
-        write!(serial, "Loop: ");
-        write!(serial, "{}\n", i);
-        write!(serial, "{}\n", f64::from(i) / 3.123_456_789);
+        write!(serial, "Loop: ").unwrap();
+        writeln!(serial, "{}", i).unwrap();
+        writeln!(serial, "{}", f64::from(i) / 3.123_456_789).unwrap();
         delay.delay_ms(250u32);
         led.set_high();
         delay.delay_ms(250u32);

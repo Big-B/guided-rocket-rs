@@ -10,8 +10,9 @@ nb = {version = "*", features = ["unstable"]}
 libm = "*"
 cortex-m = "*"
 heapless = {version = "*", features = ["const-fn"]}
+embedded-sdmmc = { git = "https://github.com/thejpster/embedded-sdmmc-rs"}
 
 [dependencies.arduino_mkrzero]
 version = "*"
-git = "https://github.com/djmcgill/atsamd21-rs"
+git = "https://github.com/atsamd-rs/atsamd"
 features = ["rt", "panic_abort", "use_semihosting"]
