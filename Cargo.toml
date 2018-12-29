@@ -10,7 +10,8 @@ nb = {version = "*", features = ["unstable"]}
 libm = "*"
 cortex-m = "*"
 heapless = {version = "*", features = ["const-fn"]}
-embedded-sdmmc = { git = "https://github.com/thejpster/embedded-sdmmc-rs"}
+embedded-sdmmc = { git = "https://github.com/thejpster/embedded-sdmmc-rs" }
+mpu6050 = { git = "https://github.com/Big-B/mpu6050" }
 
 [dependencies.arduino_mkrzero]
 version = "*"
