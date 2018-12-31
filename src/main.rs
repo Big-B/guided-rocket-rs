@@ -7,8 +7,8 @@ use arduino_mkrzero::delay::Delay;
 use arduino_mkrzero::prelude::*;
 use arduino_mkrzero::sercom::*;
 use arduino_mkrzero::{entry, CorePeripherals, Peripherals};
-
 use core::fmt::Write;
+use mpu6050::{Addr, AfSel, Error, FsSel, GenericArray, Mpu6050, Register, U107};
 
 #[entry]
 fn main() -> ! {
@@ -33,6 +33,8 @@ fn main() -> ! {
         .tx
         .into_push_pull_output(&mut pins.port)
         .into_pad(&mut pins.port);
+
+    // Setup UART device
     let mut serial = UART5::new(
         &clocks.sercom5_core(&gclk0).unwrap(),
         115_200.hz(),
@@ -44,16 +46,43 @@ fn main() -> ! {
             tx: tx_pin,
         },
     );
-    let mut i = 0u32;
-    loop {
-        led.set_low();
-        write!(serial, "Loop: ").unwrap();
-        writeln!(serial, "{}", i).unwrap();
-        writeln!(serial, "{}", f64::from(i) / 3.123_456_789).unwrap();
-        delay.delay_ms(250u32);
-        led.set_high();
-        delay.delay_ms(250u32);
-        led.set_low();
-        i += 1;
-    }
+
+    // This delay seems to be necessary to ensure the next print statement
+    // comes out intact
+    delay.delay_ms(250u32);
+    writeln!(serial, "=======ENTER=======").unwrap();
+
+    // Setup I2C port
+    let i2c = I2CMaster0::new(
+        &clocks.sercom0_core(&gclk0).unwrap(),
+        400.khz(),
+        peripherals.SERCOM0,
+        &mut peripherals.PM,
+        pins.sda.into_pad(&mut pins.port),
+        pins.scl.into_pad(&mut pins.port),
+    );
+
+    // Instantiate imu instance
+    let imu = Mpu6050::new(i2c, Addr::LOW, AfSel::PlusMinus2G, FsSel::PlusMinus250DPS);
+    match imu {
+        Ok(mut imu) => loop {
+            let reg = Register::AccelConfig;
+            let val = imu.read_register(reg).unwrap();
+            let gyro = imu.gyro_in_dps().unwrap();
+            let accl = imu.accel_in_g().unwrap();
+
+            writeln!(serial, "gyro - x: {}, y: {}, z: {}", gyro.x, gyro.y, gyro.z).unwrap();
+            writeln!(serial, "accl - x: {}, y: {}, z: {}", accl.x, accl.y, accl.z).unwrap();
+            writeln!(serial, "{:?}: {}", reg, val).unwrap();
+
+            led.set_low();
+            delay.delay_ms(250u32);
+            led.set_high();
+            delay.delay_ms(250u32);
+        },
+        Err(Error::I2c(_)) => writeln!(serial, "I2C Error").unwrap(),
+        Err(Error::BadIdentifier) => writeln!(serial, "Bad Identifier").unwrap(),
+    };
+
+    loop {}
 }

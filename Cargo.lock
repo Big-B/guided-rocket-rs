@@ -182,7 +182,7 @@ dependencies = [
 [[package]]
 name = "mpu6050"
 version = "0.1.0"
-source = "git+https://github.com/Big-B/mpu6050#2a4efb1f8c15e77912cd76ae4ae8bfc842c9fc0e"
+source = "git+https://github.com/Big-B/mpu6050#f71db98f8838fe10861215f87d4deb9b5f2f4208"
 dependencies = [
  "embedded-hal 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "generic-array 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
