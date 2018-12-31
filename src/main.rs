@@ -8,7 +8,7 @@ use arduino_mkrzero::prelude::*;
 use arduino_mkrzero::sercom::*;
 use arduino_mkrzero::{entry, CorePeripherals, Peripherals};
 use core::fmt::Write;
-use mpu6050::{Addr, AfSel, Error, FsSel, GenericArray, Mpu6050, Register, U107};
+use mpu6050::{Addr, AfSel, Error, FsSel, Mpu6050};
 
 #[entry]
 fn main() -> ! {
@@ -66,14 +66,13 @@ fn main() -> ! {
     let imu = Mpu6050::new(i2c, Addr::LOW, AfSel::PlusMinus2G, FsSel::PlusMinus250DPS);
     match imu {
         Ok(mut imu) => loop {
-            let reg = Register::AccelConfig;
-            let val = imu.read_register(reg).unwrap();
             let gyro = imu.gyro_in_dps().unwrap();
             let accl = imu.accel_in_g().unwrap();
+            let temp = imu.temp_in_deg_c().unwrap();
 
             writeln!(serial, "gyro - x: {}, y: {}, z: {}", gyro.x, gyro.y, gyro.z).unwrap();
             writeln!(serial, "accl - x: {}, y: {}, z: {}", accl.x, accl.y, accl.z).unwrap();
-            writeln!(serial, "{:?}: {}", reg, val).unwrap();
+            writeln!(serial, "temp: {}", temp).unwrap();
 
             led.set_low();
             delay.delay_ms(250u32);
@@ -84,5 +83,5 @@ fn main() -> ! {
         Err(Error::BadIdentifier) => writeln!(serial, "Bad Identifier").unwrap(),
     };
 
-    loop {}
+    panic!();
 }
