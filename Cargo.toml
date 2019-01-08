@@ -16,4 +16,4 @@ mpu6050 = { git = "https://github.com/Big-B/mpu6050" }
 [dependencies.arduino_mkrzero]
 version = "*"
 git = "https://github.com/atsamd-rs/atsamd"
-features = ["rt", "panic_abort", "use_semihosting"]
+features = ["rt", "use_semihosting"]
