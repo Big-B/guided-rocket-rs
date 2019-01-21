@@ -8,7 +8,7 @@ use arduino_mkrzero::prelude::*;
 use arduino_mkrzero::sercom::*;
 use arduino_mkrzero::{entry, CorePeripherals, Peripherals};
 use core::fmt::Write;
-use mpu6050::{Addr, AfSel, Error, FsSel, Mpu6050};
+use mpu6050::{Addr, AfSel, FsSel, Mpu6050, Mpu6050Error};
 
 #[entry]
 fn main() -> ! {
@@ -79,8 +79,8 @@ fn main() -> ! {
             led.set_high();
             delay.delay_ms(250u32);
         },
-        Err(Error::I2c(_)) => writeln!(serial, "I2C Error").unwrap(),
-        Err(Error::BadIdentifier) => writeln!(serial, "Bad Identifier").unwrap(),
+        Err(Mpu6050Error::I2c(_)) => writeln!(serial, "I2C Error").unwrap(),
+        Err(Mpu6050Error::BadIdentifier) => writeln!(serial, "Bad Identifier").unwrap(),
     };
 
     panic!();
